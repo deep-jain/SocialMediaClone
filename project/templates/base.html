@@ -1,7 +1,14 @@
 {% extends "header.html" %}
 {% block content %}
-<div class="container py-5">
-	<p>hello world!</p>
-</div>
+<section class="vh-100">
+	<h1 class="text-uppercae text-center p-4 mb-4">
+		{{ quotes|random }}
+	</h1>
+	{% if user.is_authenticated %}
+		{% if user.get_username == "admin" %}
+		<meta http-equiv = "refresh" content = "0; url = /admin" />
+		{% endif %}
+	{% endif %}
+</section>
 {% endblock %}
 

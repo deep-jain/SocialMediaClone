@@ -7,7 +7,9 @@ from django.contrib.auth.forms import AuthenticationForm
 import datetime
 
 def home(request):
-    return render(request, '../templates/base.html')
+    quotes = ['Up from the 36 Chambers...', 'Wu-tang killa bees we in a swarm.', 'Protect ya neck', 'ODB sends his regards']
+
+    return render(request, '../templates/base.html', {'quotes':quotes})
 
 def register_request(request):
     if request.method == "POST":

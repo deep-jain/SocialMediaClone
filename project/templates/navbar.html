@@ -1,24 +1,27 @@
 <!--Navbar-->
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
-	<a class="navbar-brand" href="#">Menu</a>
+	<a class="navbar-brand" href="/">Home</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 	<div class="collapse navbar-collapse" id="navbarText">
-		<ul class="navbar-nav mr-auto">
+		<ul class="navbar-nav ms-auto">
 			{% if user.is_authenticated %}
-			<li class="nav-item">
-				<a class="nav-link" href="/logout">Logout</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">Welcome, {{user.username}}</a>
-			</li>
+			<div class="nav navbar-right">
+				<li class="nav-item">
+					<a class="nav-link" href="/logout">Logout</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Welcome, {{user.username}}</a>
+				</li>
+			</div>
 
 			{% else %}
-
-			<li class="nav-item">
-				<a class="nav-link" href="/login">Login</a>
-			</li>
+			<div class="nav navbar-right">
+				<li class="nav-item">
+					<a class="nav-link" href="/login">Login</a>
+				</li>
+			</div>
 
 			{% endif %}
 		</ul>
