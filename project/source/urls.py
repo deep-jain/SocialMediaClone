@@ -18,6 +18,7 @@ from django.urls import path
 from source import views
 
 app_name = 'source'
+admin.site.site_header = 'Group 3 Admin'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,3 +27,7 @@ urlpatterns = [
     path('login', views.login_request, name='login'),
     path('logout', views.logout_request, name='logout')
 ]
+"""
+This script manages and creates url paths to different pages on the site.
+Made by: Nada
+"""

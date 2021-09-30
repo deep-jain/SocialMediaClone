@@ -18,3 +18,8 @@ class NewUserForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+'''
+This python program is designed to to take new registration infomation from user registration page.
+Made by: Deep Jain
+'''

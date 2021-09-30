@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 import datetime
 
 def home(request):
-    quotes = ['Up from the 36 Chambers...', 'Wu-tang killa bees we in a swarm.', 'Protect ya neck', 'ODB sends his regards']
+    quotes = ['Up from the 36 Chambers...', 'Wu-tang killa bees we in a swarm.', 'Protect ya neck', 'ODB sends his regards', 'Toad style is immensely strong and immune to nearly any weapon']
 
     return render(request, '../templates/base.html', {'quotes':quotes})
 
