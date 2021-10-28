@@ -1,0 +1,34 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+<!--Login-->
+<section class="bg-image" style="height: 94.1vh; background-image: url('https://pbs.twimg.com/media/DwKOjshW0AE3uTB?format=jpg&name=medium');">
+	<div class="container h-100">
+		<div class="row d-flex justify-content-center align-items-center h-100">
+      			<div class="col-12 col-md-9 col-lg-7 col-xl-6">
+      				<div class="card-transparent rounded-3">
+      					<div class="card-body p-5 special-card" style="background-color: rgba(245, 245, 245, 0.9);">
+				        <h1 class="text-uppercase text-center">Login</h1>
+					<p class="text-center">I'll let you try my Wutang swordstyle.</p>
+					<form method="POST" class="d-flex flex-column justify-content-center align-items-center">
+				                {% csrf_token %}
+				                {{ login_form|crispy }}
+						<div class="d-flex justify-content-center p-2 col-6 mx-auto">
+				                	<button class="btn btn-primary btn-block text-bold" type="submit">Login</button>
+						</div>
+				        </form>
+				        <p class="p-2 text-center">Don't have an account? <a href="/register">Enter the 36 chambers.</a>.</p>
+				        </div>
+				</div>
+		        </div>
+		</div>
+	</div>
+</section>
+
+{% endblock %}
+<!--This script is responsible for the login's page interface. 
+	Users & admins will be able to login only through this page.
+	Made by: Nada-->

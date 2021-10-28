@@ -1,0 +1,53 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+{% if post.censor %}
+	<p>THIS POST HAS BEEN CENSORED FOR ADMINISTRATIVE PURPOSES.</p>
+
+{% else %}
+
+    <div class="container">
+
+    <p><strong>{{ post.title }}</strong>&emsp;&emsp;&emsp;{{ post.author }}</p>
+    <p><i>{{ post.created_on }}</i></p>
+    {% if post.media != "" %}
+        <p><img src={{post.media}} alt="Media" style="display: block; max-width: 85%; height: auto; margin-left: auto; margin-right: auto;"></p>
+    {% endif %}
+    <p>{{ post.content }}</p>	
+    <!-- <strong><p>{{ post.author }}</strong>{{post.created_on}}</p>
+    <p>{{ post.title }}</p>
+    <p>{{ post.content }}</p>
+
+    <p>
+    {% if post.media != NULL %}
+    <img src={{post.media}} alt="Media">
+    {% endif %}
+    </p> -->
+
+    {% if user.is_superuser %}
+    <form action="#" method="get">
+        <input type="submit" class="btn btn-danger btn-block text-bold" value="BLOCK POST" name="mybtn">
+    </form>
+    {% endif %}
+
+    <form method="POST">  <!-- enctype="multipart/form-data"> -->
+        {% csrf_token %}
+        {{comment_form | crispy}}
+        <div class="d-flex justify-content-center p-2 col-6 mx-auto">
+                <button class="btn btn-primary btn-block text-bold" type="submit">Comment</button>
+        </div>
+    </form>
+
+    {% for comment in comments %}
+        {% if comment.post_id == post.id %}
+            <p><strong>{{ comment.author_id }}</strong> &emsp;&emsp; <em>{{ comment.created_on }}</em></p>
+            <p>{{ comment.content }}</p>
+        {% endif %}
+    {% endfor %}
+
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "header.html" %}
+{% block content %}
+
+<audio id="player" controls></audio>
+<script>
+
+    navigator.permissions.query({name:'microphone'}).then(function(result) {
+    if (result.state == 'granted') {
+
+    } else if (result.state == 'prompt') {
+
+    } else if (result.state == 'denied') {
+
+    }
+    result.onchange = function() {
+
+    };
+    });
+    const player = document.getElementById('player');
+
+    const handleSuccess = function(stream) {
+    if (window.URL) {
+        player.srcObject = stream;
+    } else {
+        player.src = stream;
+    }
+    };
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(handleSuccess);
+</script>
+
+
+<!-- <body>
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-offset-4 is-4">
+                    <div class="box">
+                        <article class="media">
+                            <div class="media-left">
+                                <figure class="image is-50x50">
+                                    <img src="http://openweathermap.org/img/w/{{ city_weather.icon }}.png" alt="Image">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <span class="title">{{city_weather.city}}</span>
+                                        <br>
+                                        <span class="subtitle">{{ city_weather.temperature }}</span>
+                                        <br> {{ city_weather.description }}
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body> -->
+
+{% endblock %}

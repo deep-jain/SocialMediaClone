@@ -1,0 +1,24 @@
+{% extends "header.html" %}
+{% block content %}
+
+<div class="container">
+
+{% for data in title %}
+	{% if data.censor == 0 %}
+		{% if forloop.counter0|divisibleby:3 %} <div class="row text-center"> {%  endif %}
+		<div class="col-sm-4">
+			<p><strong><a href="{% url 'post-detail' data.pk %}">{{ data.title }}</a></strong>&emsp;&emsp;-{{ data.author }}</p>
+			<p><i>{{ data.created_on }}</i></p>
+			{% if data.media != "" %}
+				<p><a href="{% url 'post-detail' data.pk %}"><img src={{ data.media }} alt="Media" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;"></a></p>
+			{% endif %}
+			<p>{{ data.content }}</p>
+		</div>
+	{%  if forloop.counter|divisibleby:3 or forloop.last %}</div><!-- row closing --><hr>{%  endif %}
+	{% endif %}
+
+{% endfor %}
+</div>
+
+{% endblock %}
+

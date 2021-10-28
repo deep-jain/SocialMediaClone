@@ -1,0 +1,14 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+<form method="POST">  <!-- enctype="multipart/form-data"> -->
+    {% csrf_token %}
+    {{post_form | crispy}}
+    <div class="d-flex justify-content-center p-2 col-6 mx-auto">
+            <button class="btn btn-primary btn-block text-bold" type="submit">Post</button>
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "header.html" %}
+{% block content %}
+
+    <center>
+        
+        {% if searched %}
+            <h2>Search Results for: {{ searched }}</h2>
+            <br/>
+            {% for dat in data %}
+                {% if dat.censor == 0 %}
+                    <p>Post:</p>
+                    <p><strong>{{ dat.title }}</strong>&emsp;&emsp;&emsp;{{ dat.author }}</p>
+                    <p><i>{{ dat.created_on }}</i></p>
+                    {% if dat.media != "" %}
+                        <p><img src={{dat.media}} alt="Media" style="display: block; max-width: 85%; height: auto; margin-left: auto; margin-right: auto;"></p>
+                    {% endif %}
+                    <p>{{ dat.content }}</p>	
+                    <p>	<a href="{% url 'post-detail' dat.pk %}">Comment</a></p>
+                    <hr>
+                {% endif %}
+                <!-- <p>	<a href="{% url 'post-detail' dat.pk %}">{{ dat.title }}</a></p> -->
+            {% endfor %}
+        {% else %}
+            <h2>Error: Please fill search field</h2>
+        {% endif %}
+    </center>
+
+{% endblock %}
