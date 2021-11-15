@@ -3,7 +3,7 @@
 {% block content %}
 
 {% load crispy_forms_tags %}
-<form method="POST">  <!-- enctype="multipart/form-data"> -->
+<form method="POST" class="d-flex flex-column justify-content-center align-items-center">  <!-- enctype="multipart/form-data"> -->
     {% csrf_token %}
     {{post_form | crispy}}
     <div class="d-flex justify-content-center p-2 col-6 mx-auto">

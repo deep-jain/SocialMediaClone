@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-!^#@5wiu6@np-(@2!4%vhg8)=)twcl^7i!s+_od-(id0pw$#2r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['137.184.102.203', 'localhost']
+ALLOWED_HOSTS = ['www.mlog.live','mlog.live', '137.184.102.203', 'localhost']
 
 
 # Application definition

@@ -1,0 +1,32 @@
+{% extends "header.html" %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">  
+    <div class="row">    
+        <div class="col-md-12 p-5">      
+            <h3>Your Conversations</h3>    
+        </div>  
+    </div>  
+    <div class="row">    
+        <div class="col-md-12 p-5">      
+            <form method="GET" action="{% url 'create-convo' %}">        
+                <button class="btn btn-light p-3" type="submit">Start a Conversation</button>      
+            </form>    
+        </div>  
+    </div>  
+    {% for convo in convos.all %}  
+    <div class="row mb-3">    
+        <div class="card col-md-12 p-5 shadow-sm"> 
+            {% if user == convo.user1 %}     
+            <h5>{{ convo.user2 }}</h5> 
+            {% endif %}
+            {% if user == convo.user2 %}  
+            <h5>{{ convo.user1 }}</h5>
+            {% endif %}
+            <a class="stretched-link" href="{% url 'convo' convo.pk %}"></a>    
+        </div>  
+    </div>  
+    {% endfor %}
+</div>
+{% endblock content %}

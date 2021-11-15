@@ -6,22 +6,46 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.views import View
-from .forms import new_post, new_comment
+from .forms import new_post, new_comment, new_convo, new_DM
 import datetime, requests
 from django.views.generic.list import ListView
-from .models import Post, Comment, Message
+from .models import Post, Comment, Conversations, Message, suscription
 from django.db import connection
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
-
-
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 def home(request):    
     data = Post.objects.exclude(censor=1)
     data = data.reverse()
+    currentUser = request.user
+    
+    # secondHalf = track_id.split(".com/",1)[1]
+    # firstHalf = track_id.split('track')[0]
+    # emlink = firstHalf+"embed/" + secondHalf
+    # context = {
+    # 'result':track,
+    # 'embedlink':emlink,
+    #     "tracks" : tracks
+    # }
+    try:
+        user = User.objects.get(username=currentUser).pk
+        userSuscriptionData = suscription.objects.get(user_id=user)
+        susc = userSuscriptionData.suscriptions
+        susc = str(susc)
+        pst = {
+            "title" : data,
+            "sus" : susc,
+        }
+        return render(request, "base.html", pst)
+    except:
+        pass
 
     pst = {
-        "title" : data
+        "title" : data,
+        "sus": ""
     }
 
     return render(request, "base.html", pst)
@@ -67,6 +91,11 @@ def post_request(request):
         if form.is_valid():
             np = form.save(commit=False)
             np.author = request.user
+            if np.spotifyLink != "":
+                secondHalf = np.spotifyLink.split(".com/",1)[1]
+                firstHalf = np.spotifyLink.split('track')[0]
+                emlink = firstHalf+"embed/" + secondHalf
+                np.embedSpotifyLink = emlink
             np.save()
             messages.success(request, "Posted Successfully!")
             return redirect(home)
@@ -86,6 +115,15 @@ def post_view(request,pk):
     post = Post.objects.get(pk=pk)
     form = new_comment(request.POST)
     
+    try:
+        currentUser = request.user
+        user = User.objects.get(username=currentUser).pk
+        userSuscriptionData = suscription.objects.get(user_id=user)
+        susc = userSuscriptionData.suscriptions
+        susc = str(susc)
+    except:
+        susc = ""
+    
     if form.is_valid():
         cp = form.save(commit=False)
         cp.author_id = request.user
@@ -98,7 +136,8 @@ def post_view(request,pk):
     context = {
         'post':post,
         "comment_form":form,
-        "comments":comments
+        "comments":comments,
+        "sus" : susc
     }
 
     return render(request, "../templates/post_detail.html", context)
@@ -147,50 +186,148 @@ def weather(request):
 
 @login_required
 def inbox(request):
-    dmessages = Message.get_messages(user=request.user)
-    active_direct = None
-    directs = None
-
-    if dmessages:
-        message = dmessages[0]
-        active_direct = message['user'].username
-        directs = Message.objects.filter(user=request.user, recipient=message['user'])
-    for message in dmessages:
-        if message['user'].username == active_direct:
-            message['unread'] = 0
+    convos = Conversations.objects.filter(Q(user1=request.user) | Q(user2=request.user))#filter this to get queries that only involve with user
     context = {
-        'directs': directs,
-        'messages': dmessages,
-        'active_direct': active_direct,
+        'convos': convos
     }
-    return render(request, "../templates/conversations.html", context)
+    return render(request, "../templates/inbox.html", context)
 
 @login_required
-def directs(request, username):
-	user = request.user
-	messages = Message.get_messages(user=request.user)
-	active_direct = username
-	directs = Message.objects.filter(user=request.user, recipient_username=username)
-	context = {
-			'directs': directs,
-			'dmessages': messages,
-			'active_direct': active_direct,
-		}
-		
-	return render(request=request, template_name="../templates/conversations.html", context=context)
+def convo_request(request):
+    if request.method == "POST":
+        form = new_convo(request.POST)
+        username = request.POST.get('username')
+        try:
+            user2 = User.objects.get(username=username)
+            if Conversations.objects.filter(user1=request.user, user2=user2).exists(): #makes sure that the user exists in database
+                convo = Conversations.objects.filter(user1=request.user, user2=user2)[0]#grabs first conversation between 2 users
+                return redirect('convo', pk=convo.pk)
+            elif Conversations.objects.filter(user1=user2, user2=request.user).exists():
+                convo = Conversations.objects.filter(user1=user2, user2=request.user)[0]
+                return redirect('convo', pk=convo.pk)
+            if form.is_valid():#if convo does not exist, make new
+                sender_convo = Conversations(
+                    user1=request.user,
+                    user2=user2
+                )
+                sender_convo.save()
+                convo_pk = sender_convo.pk
+                return redirect('convo', pk=convo_pk)
+        except:
+            return redirect('create-convo')
+        messages.error(request, form.errors)
+    form = new_convo()
 
-#in urls.py it should be path('send/', SendDirect, name='send_direct')
-#in whatever.html please add <form tole="form" methods="POST" action="{{%url 'send_direct' %}}">
-#and also {% crsf_token %}
+    return render(request=request, template_name="../templates/create_convo.html", context={"convo_form":form})
+
+def convo_view(request, pk):
+    #if(request.GET.get('mybtn')):
+        #query = "UPDATE myproject_conversations SET  ?? = TRUE WHERE id = " + str(pk)
+        #cursor = connection.cursor()
+        #cursor.execute(query)
+
+    convo= Conversations.objects.get(pk=pk)
+    form = new_DM(request.POST)
+    
+    dm_list = Message.objects.filter(convo_id__pk__contains=pk)#getting conversation's pk and see if it matches the messages we wanna show
+    
+    context = {
+        'convo':convo,
+        'dm_form': form,
+        'dm_list': dm_list
+    }
+
+    return render(request, "../templates/convo.html", context)
+
+def createDM(request, pk):
+    convo = Conversations.objects.get(pk=pk)
+    if convo.user2 == request.user:
+        user2 = convo.user1
+    else:
+        user2 = convo.user2
+    
+    dm = Message(
+        convo_id = convo,
+        sender = request.user,
+        recipient = user2,
+        content = request.POST.get('dm'),
+    )
+    dm.save()
+    return redirect('convo', pk=pk)
+
 @login_required
-def send_direct(request):
-	from_user = request.user
-	to_user_username = request.POST.get('to_user')
-	content = request.POST.get('body')
-	
-	if request.method == 'POST':
-		to_user = User.objects.get(username = to_user_username)
-		Message.send_message(from_user, to_user, content)
-		return redirect('conversations')
-	else:
-		HttpResponseBadRequest()
+def followToggle(request, aut):
+    currentUser = request.user
+    try:
+        user = User.objects.get(username=currentUser).pk
+        userSuscriptionData = suscription.objects.get(user_id=user)
+
+        userSus = userSuscriptionData.suscriptions
+
+        if aut in userSus:
+            userSus = userSus.replace(aut, "")
+            userSuscriptionData.suscriptions = userSus
+            userSuscriptionData.save()
+            messages.success(request, "Unsuscribed to User.")
+            return redirect('home-feed')
+            
+        else:
+            userSuscriptionData.suscriptions = userSus + aut
+            userSuscriptionData.save()
+            messages.success(request, "Suscribed to User.")
+            return redirect('home-feed')
+    except Exception:
+        newSus = suscription(suscriptions=aut, user=currentUser)
+        newSus.save()
+
+    return redirect('homepage')
+
+def myFeed(request):
+    data = Post.objects.exclude(censor=1)
+    data = data.reverse()
+
+    currentUser = request.user
+    
+    try:
+        user = User.objects.get(username=currentUser).pk
+        userSuscriptionData = suscription.objects.get(user_id=user)
+        susc = userSuscriptionData.suscriptions
+        susc = str(susc)
+    except:
+        susc = ""
+
+    pst = {
+        "title" : data,
+        "sus" : susc
+    }
+
+    return render(request, "myfeed.html", pst)
+
+def spotify(request):
+        # data = Post.objects.values('spotifyLink')
+        # data = data.reverse()
+
+        # for track_id in str(data):
+        #     if track_id:
+        #         sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="8f5244d9e0ea43948009277c93b62688", client_secret="1e799c3a6a644d669a1f91427ebfb6e2"))
+        #         track = sp.track(track_id)
+        #         tracks += track
+
+        # # #to generate an embed link
+        # # secondHalf = track_id.split(".com/",1)[1]
+        # # firstHalf = track_id.split('track')[0]
+        # # emlink = firstHalf+"embed/" + secondHalf
+        # context = {
+        # # 'result':track,
+        # # 'embedlink':emlink,
+        #     "tracks" : tracks
+        # }
+        return render(request, "../templates/explore.html")
+
+def spotifyRender(request, link):
+    messages.success(request, "Spotify")
+    return redirect('homepage')
+    
+
+
+

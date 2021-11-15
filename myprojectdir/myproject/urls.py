@@ -29,8 +29,13 @@ urlpatterns = [
     path('post/', views.post_request, name = 'post'),
     path('post/<int:pk>', views.post_view, name ='post-detail'),
     path('search/', views.search, name = 'search'),
-    path('conversations/', views.inbox, name = 'conversations'),
+    path('inbox/', views.inbox, name = 'inbox'),
+    path('inbox/create-convo', views.convo_request, name='create-convo'),
+    path('inbox/<int:pk>/', views.convo_view, name='convo'),
+    path('inbox/<int:pk>/create-dm/', views.createDM, name='create-dm'),
     path('weather/', views.weather),
-    path('chat/', views.directs, name = 'chat'),
-    path('send/', views.send_direct, name = 'send_direct'),
+    path('feed/', views.myFeed, name='home-feed'),
+    path("followToggle/<str:aut>/",views.followToggle, name="followToggle"),
+    path("explore/",views.spotify, name="explore"),
+    path("spotifyRender/<str:link>/",views.spotifyRender, name="spotifyRender")
 ]

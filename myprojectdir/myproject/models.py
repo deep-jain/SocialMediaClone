@@ -12,6 +12,9 @@ class Post(models.Model):
     censor = models.BooleanField(default=False)
     content = models.TextField()
     slug = models.SlugField(unique=True, max_length=255)
+    spotifyLink = models.URLField(blank=True)
+    embedSpotifyLink = models.CharField(blank=True, max_length=255)
+
 
     def get_absolute_url(self):
         return reverse('user_post_detail', args[self.slug])
@@ -33,38 +36,17 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
 
+class Conversations(models.Model):
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user1")
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2")
 
-#PLEASE MIGRATE TO ADD THIS TABLE TO DATABASE!
 class Message(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user')
+    convo_id = models.ForeignKey(Conversations, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_user")
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_user")
     content = models.TextField(max_length=1000, blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(auto_now_add=True)
 
-    def send_message(from_user, to_user, content):
-        sender_message = Message(
-            user=from_user,
-            sender=from_user,
-            recipient=to_user,
-            content=content)
-        sender_message.save()
-
-        recipient_message = Message(
-            user=to_user,
-            sender=from_user,
-            content=content,
-            recipient=from_user)
-        recipient_message.save()
-
-        return sender_message
-
-    def get_messages(user):
-        users = []
-        messages = Message.objects.filter(user=user).values('recipient').annotate(last=Max('date')).order_by('-last')
-        for message in messages:
-            users.append({
-                'user':User.objects.get(pk=message['recipient']),
-                'last': message['last'],
-            })
-        return users
+class suscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    suscriptions = models.TextField(max_length=10000, blank=True)

@@ -16,7 +16,21 @@
     {% if post.media != "" %}
         <p><img src={{post.media}} alt="Media" style="display: block; max-width: 85%; height: auto; margin-left: auto; margin-right: auto;"></p>
     {% endif %}
-    <p>{{ post.content }}</p>	
+    <p>{{ post.content }}</p>
+
+    {% if post.embedSpotifyLink %}
+		<iframe src={{post.embedSpotifyLink}} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+	{% endif %}	
+
+    {% if user.is_authenticated %}
+        {% if post.author|stringformat:"s" not in sus %}
+            {% csrf_token %}
+            <a href="{% url 'followToggle' aut=post.author %}" class="btn btn-primary">Follow</a>
+        {% else %}
+            {% csrf_token %}
+            <a href="{% url 'followToggle' aut=post.author %}" class="btn btn-primary" style="background: red;">Unfollow</a>
+        {% endif %}
+    {% endif %}
     <!-- <strong><p>{{ post.author }}</strong>{{post.created_on}}</p>
     <p>{{ post.title }}</p>
     <p>{{ post.content }}</p>
@@ -33,7 +47,7 @@
     </form>
     {% endif %}
 
-    <form method="POST">  <!-- enctype="multipart/form-data"> -->
+    <form method="POST" class="d-flex flex-column justify-content-center align-items-center">  <!-- enctype="multipart/form-data"> -->
         {% csrf_token %}
         {{comment_form | crispy}}
         <div class="d-flex justify-content-center p-2 col-6 mx-auto">

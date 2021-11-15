@@ -1,0 +1,41 @@
+{% extends "header.html" %}
+{% block content %}
+
+<section>
+<div class="container">
+{% if sus %}
+    {% for data in title %}
+        {% if data.author|stringformat:"s" in sus %}
+            {% if data.censor == 0 %}
+                {% if forloop.counter0|divisibleby:3 %} <div class="row text-center"> {%  endif %}
+                <div class="col-sm-4">
+                    <p><strong><a href="{% url 'post-detail' data.pk %}">{{ data.title }}</a></strong>&emsp;&emsp;-{{ data.author }}</p>
+                    <p><i>{{ data.created_on }}</i></p>
+                    {% if data.media != "" %}
+                        <p><a href="{% url 'post-detail' data.pk %}"><img src={{ data.media }} alt="Media" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;"></a></p>
+                    {% endif %}
+                    <p>{{ data.content }}</p>
+                    {% if data.embedSpotifyLink %}
+				        <iframe src={{data.embedSpotifyLink}} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+			        {% endif %}
+                    {% if user.is_authenticated %}
+                        {% if data.author|stringformat:"s" not in sus %}
+                            {% csrf_token %}
+                            <a href="{% url 'followToggle' aut=data.author %}" class="btn btn-primary">Follow</a>
+                        {% else %}
+                            {% csrf_token %}
+                            <a href="{% url 'followToggle' aut=data.author %}" class="btn btn-primary" style="background: red;">Unfollow</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {%  if forloop.counter|divisibleby:3 or forloop.last %}</div><!-- row closing --><hr>{%  endif %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+    <center><h2><strong>You don't follow anyone!</strong></h2></center>
+{% endif %}
+</section>
+{% endblock %}
+

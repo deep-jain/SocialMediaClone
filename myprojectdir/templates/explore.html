@@ -1,0 +1,29 @@
+{% extends "header.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% for track in tracks}
+    <!-- <div class="container h-100">
+        <form method="POST" class="d-flex flex-column justify-content-center align-items-center">
+            {% csrf_token %}
+            
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <input name="url" type="">
+                    <button type="submit" class="btn btn-success btn-lg mt-1">submit</button>
+                </div>
+            </div>
+        </form> -->
+        <!-- {%if result %} -->
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <ol class="list-group mt-1">
+                <!-- <li class="list-group-item bg-info-text-center"><iframe src= {{embedlink}} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></li> -->
+                <li class="list-group-item bg-info-text-center"><h3>{{track.name}}</h3></li>
+            </ol>
+        </div>
+        <!-- {% endif %} -->
+        
+    </div>
+{% endfor %}
+
+{% endblock %}
